@@ -46,8 +46,11 @@ contract CriptoMoonToken is ERC20, AccessControl, Pausable, ReentrancyGuard {
     // Event emitted when ERC20 tokens are recovered.
     event ERC20Recovered(address indexed tokenAddress, uint256 amount, address indexed to);
 
-    // Event emitted when native tokens are recovered.
-    event NativeTokensRecovered(uint256 amount, address indexed to);
+    // Event emitted when tokens of this contract are recovered.
+    event OwnTokensRecovered(uint256 amount, address indexed to);
+
+    // Event emitted when ETH is recovered.
+    event ETHRecovered(uint256 amount, address indexed to);
 
     // Constructor: Initializes the token with name, symbol, initial supply, and treasury wallet.
     constructor(
@@ -148,11 +151,45 @@ contract CriptoMoonToken is ERC20, AccessControl, Pausable, ReentrancyGuard {
     ) external nonReentrant onlyRole(ADMIN_ROLE) {
         require(
             tokenAddress != address(this),
-            "CriptoMoonToken: cannot recover native token"
+            "CriptoMoonToken: use recoverOwnToken for native token"
         );
-        IERC20(tokenAddress).transfer(to, amount);
+        IERC20(tokenAddress).transfer(to, amount); // Use transfer for ERC20 tokens.
         emit ERC20Recovered(tokenAddress, amount, to); // Emit event to log the recovery.
     }
+
+    // Function to recover tokens of this contract sent to itself by mistake.
+    // Only accessible by accounts with the ADMIN_ROLE.
+    function recoverOwnToken(
+        uint256 amount,
+        address to
+    ) external nonReentrant onlyRole(ADMIN_ROLE) {
+        require(
+            amount <= balanceOf(address(this)),
+            "CriptoMoonToken: insufficient contract balance"
+        );
+        _transfer(address(this), to, amount); // Use _transfer for native tokens of this contract.
+        emit OwnTokensRecovered(amount, to);
+    }
+
+    // Function to recover ETH sent to the contract by mistake.
+    // Only accessible by accounts with the ADMIN_ROLE.
+    function recoverETH(
+        uint256 amount,
+        address payable to
+    ) external nonReentrant onlyRole(ADMIN_ROLE) {
+        require(
+            address(this).balance >= amount,
+            "CriptoMoonToken: insufficient ETH balance"
+        );
+
+        (bool success, ) = to.call{value: amount}("");
+        require(success, "CriptoMoonToken: ETH transfer failed");
+
+        emit ETHRecovered(amount, to); // Emit event to log the recovery.
+    }
+
+    // Allow the contract to receive ETH.
+    receive() external payable {}
 
     // Function to recover native tokens sent to the contract by mistake.
     // Only accessible by accounts with the ADMIN_ROLE.

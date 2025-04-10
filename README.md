@@ -17,7 +17,7 @@ A Solidity-based ERC20 token contract with advanced features such as minting, bu
 - **Airdrops**: Admins can distribute tokens to multiple recipients in a single transaction.
 - **Pausing**: Admins can pause all token transfers and operations.
 - **Role-Based Access Control**: Uses `ADMIN_ROLE` and `DEV_ROLE` for secure and flexible permission management.
-- **Token Recovery**: Admins can recover accidentally sent ERC20 or native tokens.
+- **Token Recovery**: Admins can recover accidentally sent ERC20 tokens, own tokens of this contract, or ETH.
 
 ### 📜 Available Functions
 
@@ -32,7 +32,8 @@ A Solidity-based ERC20 token contract with advanced features such as minting, bu
 | `removeRole(bytes32, address)` | Revokes a specific role from an account.                                                   | `ADMIN_ROLE`         |
 | `airdrop(address[], uint256[])` | Distributes tokens to multiple recipients in a single transaction.                        | `ADMIN_ROLE`         |
 | `recoverERC20(address, uint256, address)` | Recovers ERC20 tokens accidentally sent to the contract.                        | `ADMIN_ROLE`         |
-| `recoverNativeTokens(uint256, address)` | Recovers native tokens accidentally sent to the contract.                         | `ADMIN_ROLE`         |
+| `recoverOwnToken(uint256, address)` | Recovers tokens of this contract accidentally sent to itself.                        | `ADMIN_ROLE`         |
+| `recoverETH(uint256, address payable)` | Recovers ETH accidentally sent to the contract.(**with call() not limited gas 2300**) | `ADMIN_ROLE`         |
 | `updateTreasuryWallet(address)` | Updates the treasury wallet address.                                                      | `ADMIN_ROLE`         |
 | `transfer(address, uint256)` | Transfers tokens to another address, applying fees unless exempt.                            | Public               |
 | `transferFrom(address, address, uint256)` | Transfers tokens on behalf of another address, applying fees unless exempt.       | Public               |
@@ -82,14 +83,13 @@ Follow these steps to set up and deploy the contract:
 
 ### 🚀 Deployment
 
-1. Compile the contract using Remix, Foundry or your preferred deployment tool.
-   
-2. Deploy the contract using Remix, Foundry or your preferred deployment tool.
+1. Compile the contract using Remix, Foundry, or your preferred deployment tool.
 
+2. Deploy the contract using Remix, Foundry, or your preferred deployment tool.
 
 ### 🧪 Testing
 
-Testing the contract using Remix, Foundry or your preferred deployment tool.
+Test the contract using Remix, Foundry, or your preferred deployment tool.
 
 ## 🔮 Future Improvements
 
@@ -103,7 +103,6 @@ Testing the contract using Remix, Foundry or your preferred deployment tool.
 - **Upgradeable Contract**: Use a proxy pattern to make the contract upgradeable for future feature additions.
 - **Multisignature Wallet Support**: Integrate multisignature wallets for critical administrative actions to enhance security and decentralization.
 - **Multi-Treasury Support**: Enable multiple treasury wallets with configurable fee splits.
-
 
 ## 📜 License
 
